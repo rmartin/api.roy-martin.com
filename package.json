@@ -1,0 +1,20 @@
+{
+  "name": "api-roy-martin.com",
+  "version": "0.0.1",
+  "description": "API layer for Roy Martin's Personal Website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@heroku.com:api-roy-martin.git"
+  },
+  "author": "Roy Martin",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.10.6",
+    "gzippo": "^0.2.0",
+    "strava-v3": "^1.5.3"
+  }
+}
