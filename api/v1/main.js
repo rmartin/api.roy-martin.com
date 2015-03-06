@@ -2,6 +2,10 @@ var apiv1 = require('express').Router(),
 	_ = require('underscore'),
 	mongoose = require('mongoose'),
 	ActivityModel = require('./models/activity'),
+	passport = require('passport'),
+	TwitterStrategy = require('passport-twitter').Strategy,
+	twitterConsumerKey = process.env.TWITTER_APP_CONSUMER_KEY,
+	twitterConsumerSecret = process.env.TWITTER_APP_CONSUMER_SECRET,
 	strava = new require("strava")({
 		client_id: process.env.STRAVA_CLIENT_ID,
 		client_secret: process.env.STRAVA_CLIENT_SECRET,
@@ -9,8 +13,17 @@ var apiv1 = require('express').Router(),
 		access_token: process.env.STRAVA_ACCESS_TOKEN
 	});
 
-
 mongoose.connect('mongodb://localhost/roymartin');
+
+apiv1.get('/auth/twitter',
+  passport.authenticate('twitter'));
+
+apiv1.get('/auth/twitter/callback',
+  passport.authenticate('twitter', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/');
+  });
 
 //get list of activities such as runs and workouts
 apiv1.get('/activities', function(req, res) {
@@ -56,6 +69,20 @@ apiv1.get('/activities/update', function(req, res) {
 //combine twitter and blog posts
 apiv1.get('/thoughts', function(req, res) {
 	res.jsonp({});
+});
+
+apiv1.get('/thoughts/update', function(req, res) {
+	passport.use(new TwitterStrategy({
+		consumerKey: process.env.TWITTER_APP_CONSUMER_KEY,
+	    consumerSecret: process.env.TWITTER_APP_CONSUMER_SECRET,
+	    callbackURL: "http://127.0.0.1:5000/api/v1/auth/twitter/callback"
+	  },
+	  function(token, tokenSecret, profile, done) {
+	    User.findOrCreate({ twitterId: profile.id }, function (err, user) {
+	      return done(err, user);
+	    });
+	  }
+	));
 });
 
 //books, podcasts, etc

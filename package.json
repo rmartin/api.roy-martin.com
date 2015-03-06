@@ -16,6 +16,11 @@
     "express": "^4.10.6",
     "gzippo": "^0.2.0",
     "mongoose": "3.8.24",
+    "oauth": "^0.9.12",
+    "oauth2": "0.0.1",
+    "passport": "^0.2.1",
+    "passport-twitter": "^1.0.3",
+    "strava": "0.0.1",
     "strava-v3": "^1.5.3",
     "underscore": "^1.8.2"
   },
