@@ -23,6 +23,7 @@
     "passport-twitter": "^1.0.3",
     "strava": "0.0.1",
     "strava-v3": "^1.5.3",
+    "twitter-js-client": "0.0.5",
     "underscore": "^1.8.2"
   },
   "engines": {

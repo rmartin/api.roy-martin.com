@@ -3,18 +3,16 @@ var apiv1 = require('express').Router(),
 	mongoose = require('mongoose'),
 	ActivityModel = require('./models/activity'),
 	passport = require('passport'),
-	TwitterStrategy = require('passport-twitter').Strategy,
-	strava = null;
-
-	passport.use(new TwitterStrategy({
-		consumerKey: process.env.TWITTER_APP_CONSUMER_KEY,
-		consumerSecret: process.env.TWITTER_APP_CONSUMER_SECRET,
-		callbackURL: "http://127.0.0.1:5000/api/v1/auth/twitter/callback"
+	strava = null,
+	config = {
+		"consumerKey": process.env.TWITTER_APP_CONSUMER_KEY,
+		"consumerSecret": process.env.TWITTER_APP_CONSUMER_SECRET,
+		"accessToken": process.env.TWITTER_ACCESS_TOKEN,
+		"accessTokenSecret": process.env.TWITTER_ACCESS_SECRET,
+		"callBackUrl": "http://127.0.0.1:5000/api/v1/auth/twitter/callback"
 	},
-	function(token, tokenSecret, profile, done) {
-		res.json(profile);
-	}
-	));
+	Twitter = require('twitter-js-client').Twitter,
+	twitter = new Twitter(config);
 
 mongoose.connect(process.env.MONGOLAB_URI);
 
@@ -71,20 +69,17 @@ apiv1.get('/thoughts', function(req, res) {
 	res.jsonp({});
 });
 
+
 apiv1.get('/thoughts/update', function(req, res) {
-
-
+	twitter.getUserTimeline({
+		screen_name: 'roy_martin',
+		count: '10'
+	}, function() {
+		console.log(arguments);
+	}, function() {
+		console.log(arguments);
+	});
 });
-
-apiv1.get('/auth/twitter',
-  passport.authenticate('twitter'));
-
-apiv1.get('/auth/twitter/callback',
-  passport.authenticate('twitter', { failureRedirect: '/' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/');
-  });
 
 //books, podcasts, etc
 apiv1.get('/learning', function(req, res) {
