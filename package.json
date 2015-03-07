@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.10.6",
+    "express-session": "^1.10.3",
     "gzippo": "^0.2.0",
     "mongoose": "3.8.24",
     "oauth": "^0.9.12",

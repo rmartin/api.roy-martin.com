@@ -4,26 +4,19 @@ var apiv1 = require('express').Router(),
 	ActivityModel = require('./models/activity'),
 	passport = require('passport'),
 	TwitterStrategy = require('passport-twitter').Strategy,
-	twitterConsumerKey = process.env.TWITTER_APP_CONSUMER_KEY,
-	twitterConsumerSecret = process.env.TWITTER_APP_CONSUMER_SECRET,
-	strava = new require("strava")({
-		client_id: process.env.STRAVA_CLIENT_ID,
-		client_secret: process.env.STRAVA_CLIENT_SECRET,
-		redirect_uri: process.env.STRAVA_REDIRECT_URL,
-		access_token: process.env.STRAVA_ACCESS_TOKEN
-	});
+	strava = null;
 
-mongoose.connect('mongodb://localhost/roymartin');
+	passport.use(new TwitterStrategy({
+		consumerKey: process.env.TWITTER_APP_CONSUMER_KEY,
+		consumerSecret: process.env.TWITTER_APP_CONSUMER_SECRET,
+		callbackURL: "http://127.0.0.1:5000/api/v1/auth/twitter/callback"
+	},
+	function(token, tokenSecret, profile, done) {
+		res.json(profile);
+	}
+	));
 
-apiv1.get('/auth/twitter',
-  passport.authenticate('twitter'));
-
-apiv1.get('/auth/twitter/callback',
-  passport.authenticate('twitter', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/');
-  });
+mongoose.connect(process.env.MONGOLAB_URI);
 
 //get list of activities such as runs and workouts
 apiv1.get('/activities', function(req, res) {
@@ -40,6 +33,13 @@ apiv1.get('/activities/update', function(req, res) {
 
 	//dump model prior to inserting
 	ActivityModel.remove().exec();
+
+	strava = new require("strava")({
+		client_id: process.env.STRAVA_CLIENT_ID,
+		client_secret: process.env.STRAVA_CLIENT_SECRET,
+		redirect_uri: process.env.STRAVA_REDIRECT_URL,
+		access_token: process.env.STRAVA_ACCESS_TOKEN
+	});
 
 	strava.athlete.activities.get({}, function(args, results) {
 		_.each(results, function(activity) {
@@ -72,18 +72,19 @@ apiv1.get('/thoughts', function(req, res) {
 });
 
 apiv1.get('/thoughts/update', function(req, res) {
-	passport.use(new TwitterStrategy({
-		consumerKey: process.env.TWITTER_APP_CONSUMER_KEY,
-	    consumerSecret: process.env.TWITTER_APP_CONSUMER_SECRET,
-	    callbackURL: "http://127.0.0.1:5000/api/v1/auth/twitter/callback"
-	  },
-	  function(token, tokenSecret, profile, done) {
-	    User.findOrCreate({ twitterId: profile.id }, function (err, user) {
-	      return done(err, user);
-	    });
-	  }
-	));
+
+
 });
+
+apiv1.get('/auth/twitter',
+  passport.authenticate('twitter'));
+
+apiv1.get('/auth/twitter/callback',
+  passport.authenticate('twitter', { failureRedirect: '/' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/');
+  });
 
 //books, podcasts, etc
 apiv1.get('/learning', function(req, res) {
