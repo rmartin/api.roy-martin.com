@@ -2,6 +2,7 @@ var apiv1 = require('express').Router(),
 	_ = require('underscore'),
 	mongoose = require('mongoose'),
 	ActivityModel = require('./models/activity'),
+	SocialModel = require('./models/social'),
 	passport = require('passport'),
 	strava = null,
 	config = {
@@ -76,8 +77,26 @@ apiv1.get('/thoughts/update', function(req, res) {
 		count: '10'
 	}, function() {
 		console.log(arguments);
-	}, function() {
-		console.log(arguments);
+	}, function(results) {
+		_.each(results, function(twitterUpdate) {
+			socialModel = new SocialModel();
+
+			socialModel.id = twitterUpdate.id;
+			socialModel.body = twitterUpdate.text;
+			socialModel.type = 'twitter';
+			socialModel.postDate = twitterUpdate.created_at
+
+			// Save the activity and check for errors
+			socialModel.save(function(err) {
+				if (err)
+					res.send(err);
+			});
+		});
+
+		res.json({
+			message: 'Social posts have been updated.',
+			data: results
+		});
 	});
 });
 
