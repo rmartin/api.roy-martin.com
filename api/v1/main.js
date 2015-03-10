@@ -58,7 +58,7 @@ apiv1.get('/activities/update', function(req, res) {
 			});
 		});
 
-		res.json({
+		res.jsonp({
 			message: 'Activites have been updated.',
 			data: results
 		});
@@ -67,22 +67,35 @@ apiv1.get('/activities/update', function(req, res) {
 
 //combine twitter and blog posts
 apiv1.get('/thoughts', function(req, res) {
-	res.jsonp({});
+	// Use the model to find all activities
+	SocialModel.find(function(err, thoughts) {
+		if (err)
+			res.send(err);
+
+		res.jsonp(thoughts);
+	});
 });
 
 
 apiv1.get('/thoughts/update', function(req, res) {
+
+	//dump model prior to inserting
+	SocialModel.remove().exec();
+
 	twitter.getUserTimeline({
 		screen_name: 'roy_martin',
 		count: '10'
 	}, function() {
 		console.log(arguments);
 	}, function(results) {
+
+		//parse the results
+		results = JSON.parse(results);
+
 		_.each(results, function(twitterUpdate) {
 			socialModel = new SocialModel();
-
 			socialModel.id = twitterUpdate.id;
-			socialModel.body = twitterUpdate.text;
+			socialModel.body = twitterUpdate['text'];
 			socialModel.type = 'twitter';
 			socialModel.postDate = twitterUpdate.created_at
 
@@ -93,11 +106,10 @@ apiv1.get('/thoughts/update', function(req, res) {
 			});
 		});
 
-		res.json({
-			message: 'Social posts have been updated.',
+		res.jsonp({
+			message: 'Activites have been updated.',
 			data: results
-		});
-	});
+		});	});
 });
 
 //books, podcasts, etc

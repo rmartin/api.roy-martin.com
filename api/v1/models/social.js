@@ -4,8 +4,8 @@ var mongoose = require('mongoose');
 // Define our activities schema
 var SocialSchema  = new mongoose.Schema({
   id: Number,
-  title: String,
   type: String,
+  body: String,
   postDate: Date
 });
 
