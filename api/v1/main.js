@@ -10,7 +10,7 @@ var apiv1 = require('express').Router(),
 		"consumerSecret": process.env.TWITTER_APP_CONSUMER_SECRET,
 		"accessToken": process.env.TWITTER_ACCESS_TOKEN,
 		"accessTokenSecret": process.env.TWITTER_ACCESS_SECRET,
-		"callBackUrl": "http://127.0.0.1:5000/api/v1/auth/twitter/callback"
+		"callBackUrl": process.env.TWITTER_CALLBACK_URL
 	},
 	Twitter = require('twitter-js-client').Twitter,
 	twitter = new Twitter(config);
@@ -86,7 +86,7 @@ apiv1.get('/thoughts/update', function(req, res) {
 		screen_name: 'roy_martin',
 		count: '10'
 	}, function() {
-		console.log(arguments);
+		//error handler
 	}, function(results) {
 
 		//parse the results
