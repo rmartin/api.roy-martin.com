@@ -21,6 +21,7 @@
     "oauth2": "0.0.1",
     "passport": "^0.2.1",
     "passport-twitter": "^1.0.3",
+    "request": "^2.53.0",
     "strava": "0.0.1",
     "strava-v3": "^1.5.3",
     "twitter-js-client": "0.0.5",

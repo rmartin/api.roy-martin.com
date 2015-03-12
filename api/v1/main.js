@@ -3,7 +3,8 @@ var apiv1 = require('express').Router(),
 	mongoose = require('mongoose'),
 	ActivityModel = require('./models/activity'),
 	SocialModel = require('./models/social'),
-	passport = require('passport'),
+	ExperimentModel = require('./models/experiment'),
+	request = require('request'),
 	strava = null,
 	config = {
 		"consumerKey": process.env.TWITTER_APP_CONSUMER_KEY,
@@ -109,12 +110,62 @@ apiv1.get('/thoughts/update', function(req, res) {
 		res.jsonp({
 			message: 'Activites have been updated.',
 			data: results
-		});	});
+		});
+	});
 });
 
 //books, podcasts, etc
-apiv1.get('/learning', function(req, res) {
-	res.jsonp({});
+
+
+apiv1.get('/experiments', function(req, res){
+	// Use the model to find all activities
+	ExperimentModel.find(function(err, experiments) {
+		if (err)
+			res.send(err);
+
+		res.jsonp(experiments);
+	});
+});
+
+apiv1.get('/experiments/update', function(req, res) {
+
+	//dump model prior to inserting
+	ExperimentModel.remove().exec();
+
+	request({
+		url: 'https://api.github.com/users/rmartin/events',
+		headers: {
+			'Accept': 'application/vnd.github.v3+json',
+			'User-Agent': 'rmartin'
+		}
+	}, function callback(error, response, body) {
+		if (!error && response.statusCode == 200) {
+			var github = JSON.parse(body);
+
+			_.each(github, function(githubItem) {
+				if(githubItem.type === 'PushEvent'){
+
+					experimentModel = new ExperimentModel();
+					experimentModel.id = githubItem.id;
+					experimentModel.type = githubItem.type;
+					experimentModel.body = githubItem.payload.commits[0].message;
+					experimentModel.postDate = githubItem.created_at;
+
+					// Save the experiment and check for errors
+					experimentModel.save(function(err) {
+						if (err)
+							res.send(err);
+					});
+				}
+			});
+
+			res.jsonp({
+				message: 'Experiments have been updated.',
+				data: github
+			});
+
+		}
+	});
 });
 
 //coding and development related updates

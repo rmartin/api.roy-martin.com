@@ -2,16 +2,13 @@ var express = require('express'),
 	http = require('http'),
 	app = express(),
 	apiv1 = require('./api/v1/main'),
-	session = require('express-session'),
-	passport = require('passport');
+	session = require('express-session');
 
 app.use(session({
 	secret: process.env.EXPRESS_SESSION_SECRET,
 	resave: false,
 	saveUninitialized: true
 }));
-app.use(passport.initialize());
-app.use(passport.session());
 
 
 app.use('/api/v1', apiv1);
