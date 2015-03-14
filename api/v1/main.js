@@ -5,6 +5,8 @@ var apiv1 = require('express').Router(),
 	SocialModel = require('./models/social'),
 	ExperimentModel = require('./models/experiment'),
 	request = require('request'),
+	babel = require('babel'),
+	babelPoly = require("babel/polyfill"),
 	strava = null,
 	config = {
 		"consumerKey": process.env.TWITTER_APP_CONSUMER_KEY,
@@ -17,6 +19,39 @@ var apiv1 = require('express').Router(),
 	twitter = new Twitter(config);
 
 mongoose.connect(process.env.MONGOLAB_URI);
+
+
+//get list of activities such as runs and workouts
+apiv1.get('/all', function(req, res) {
+	var apiResponse = [];
+
+	// Use the model to find all activities
+	ActivityModel.find(function(err, activities) {
+		if (err)
+			res.send(err);
+
+		apiResponse.concat(activities);
+	}).then(result -> {
+		// Use the model to find all activities
+		SocialModel.find(function(err, thoughts) {
+			if (err)
+				res.send(err);
+
+			apiResponse.concat(thoughts);
+		})
+	}).then(result -> {
+		// Use the model to find all activities
+		ExperimentModel.find(function(err, experiments) {
+			if (err)
+				res.send(err);
+
+			apiResponse.concat(experiments);
+		});
+	}).then(() -> {
+		res.jsonp(apiResponse);
+	});
+
+});
 
 //get list of activities such as runs and workouts
 apiv1.get('/activities', function(req, res) {
@@ -117,7 +152,7 @@ apiv1.get('/thoughts/update', function(req, res) {
 //books, podcasts, etc
 
 
-apiv1.get('/experiments', function(req, res){
+apiv1.get('/experiments', function(req, res) {
 	// Use the model to find all activities
 	ExperimentModel.find(function(err, experiments) {
 		if (err)
@@ -143,7 +178,7 @@ apiv1.get('/experiments/update', function(req, res) {
 			var github = JSON.parse(body);
 
 			_.each(github, function(githubItem) {
-				if(githubItem.type === 'PushEvent'){
+				if (githubItem.type === 'PushEvent') {
 
 					experimentModel = new ExperimentModel();
 					experimentModel.id = githubItem.id;
