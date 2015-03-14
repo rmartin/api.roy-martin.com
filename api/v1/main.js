@@ -5,8 +5,6 @@ var apiv1 = require('express').Router(),
 	SocialModel = require('./models/social'),
 	ExperimentModel = require('./models/experiment'),
 	request = require('request'),
-	babel = require('babel'),
-	babelPoly = require("babel/polyfill"),
 	strava = null,
 	config = {
 		"consumerKey": process.env.TWITTER_APP_CONSUMER_KEY,
@@ -25,30 +23,27 @@ mongoose.connect(process.env.MONGOLAB_URI);
 apiv1.get('/all', function(req, res) {
 	var apiResponse = [];
 
-	// Use the model to find all activities
-	ActivityModel.find(function(err, activities) {
-		if (err)
-			res.send(err);
+	var promise = ActivityModel.find().exec();
+	promise.then(function(activities) {
+		apiResponse = apiResponse.concat(activities);
+		return SocialModel.find().exec();
 
-		apiResponse.concat(activities);
-	}).then(result -> {
-		// Use the model to find all activities
-		SocialModel.find(function(err, thoughts) {
-			if (err)
-				res.send(err);
+	}).then(function(thoughts) {
+		apiResponse = apiResponse.concat(thoughts);
 
-			apiResponse.concat(thoughts);
-		})
-	}).then(result -> {
-		// Use the model to find all activities
-		ExperimentModel.find(function(err, experiments) {
-			if (err)
-				res.send(err);
+		return ExperimentModel.find().exec();
+	}).then(function(experiments) {
+		apiResponse = apiResponse.concat(experiments);
 
-			apiResponse.concat(experiments);
+		return res.json({
+			status: 'ok',
+			result: apiResponse
 		});
-	}).then(() -> {
-		res.jsonp(apiResponse);
+	}).then(null, function(err) {
+		return res.json({
+			status: 'error',
+			result: err
+		});
 	});
 
 });
