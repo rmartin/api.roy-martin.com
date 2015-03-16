@@ -73,14 +73,17 @@ apiv1.get('/activities/update', function(req, res) {
 
 	strava.athlete.activities.get({}, function(args, results) {
 		_.each(results, function(activity) {
-			activityModel = new ActivityModel();
-
-			activityModel.id = activity.id;
-			activityModel.title = activity.name;
-			activityModel.type = activity.type;
-			activityModel.distance = activity.distance;
-			activityModel.elapsedTime = activity.elapsed_time;
-			activityModel.startDate = activity.start_date
+			activityModel = new ActivityModel({
+				id: activity.id,
+				type: 'activity',
+				postDate: activity.start_date,
+				content: {
+					title: activity.name,
+					subtype: activity.type,
+					distance: activity.distance,
+					elapsedTime: activity.elapsed_time
+				}
+			});
 
 			// Save the activity and check for errors
 			activityModel.save(function(err) {
@@ -124,11 +127,15 @@ apiv1.get('/thoughts/update', function(req, res) {
 		results = JSON.parse(results);
 
 		_.each(results, function(twitterUpdate) {
-			socialModel = new SocialModel();
-			socialModel.id = twitterUpdate.id;
-			socialModel.body = twitterUpdate['text'];
-			socialModel.type = 'twitter';
-			socialModel.postDate = twitterUpdate.created_at
+			socialModel = new SocialModel({
+				id: twitterUpdate.id,
+				type: 'thoughts',
+				postDate: twitterUpdate.created_at,
+				content: {
+					subtype: 'twitter',
+					body: twitterUpdate['text']
+				}
+			});
 
 			// Save the activity and check for errors
 			socialModel.save(function(err) {
@@ -175,11 +182,15 @@ apiv1.get('/experiments/update', function(req, res) {
 			_.each(github, function(githubItem) {
 				if (githubItem.type === 'PushEvent') {
 
-					experimentModel = new ExperimentModel();
-					experimentModel.id = githubItem.id;
-					experimentModel.type = githubItem.type;
-					experimentModel.body = githubItem.payload.commits[0].message;
-					experimentModel.postDate = githubItem.created_at;
+					experimentModel = new ExperimentModel({
+						id: githubItem.id,
+						type: 'experiments',
+						postDate: githubItem.created_at,
+						content: {
+							subtype: githubItem.type,
+							body: githubItem.payload.commits[0].message
+						}
+					});
 
 					// Save the experiment and check for errors
 					experimentModel.save(function(err) {
@@ -196,11 +207,6 @@ apiv1.get('/experiments/update', function(req, res) {
 
 		}
 	});
-});
-
-//coding and development related updates
-apiv1.get('/coding', function(req, res) {
-	res.jsonp({});
 });
 
 module.exports = apiv1;
