@@ -42,7 +42,7 @@ apiv1.get('/all', function(req, res) {
 	}).then(null, function(err) {
 		return res.json({
 			status: 'error',
-			result: err
+			data: err
 		});
 	});
 
@@ -55,7 +55,10 @@ apiv1.get('/activities', function(req, res) {
 		if (err)
 			res.send(err);
 
-		res.jsonp(activities);
+		res.jsonp({
+			status: 'ok',
+			data: activities
+		});
 	});
 });
 
@@ -93,7 +96,7 @@ apiv1.get('/activities/update', function(req, res) {
 		});
 
 		res.jsonp({
-			message: 'Activites have been updated.',
+			status: 'ok',
 			data: results
 		});
 	});
@@ -106,7 +109,10 @@ apiv1.get('/thoughts', function(req, res) {
 		if (err)
 			res.send(err);
 
-		res.jsonp(thoughts);
+		res.jsonp({
+			status: 'ok',
+			data: thoughts
+		});
 	});
 });
 
@@ -145,7 +151,7 @@ apiv1.get('/thoughts/update', function(req, res) {
 		});
 
 		res.jsonp({
-			message: 'Activites have been updated.',
+			status: 'ok',
 			data: results
 		});
 	});
@@ -160,7 +166,10 @@ apiv1.get('/experiments', function(req, res) {
 		if (err)
 			res.send(err);
 
-		res.jsonp(experiments);
+		res.jsonp({
+			message: 'ok',
+			data: experiments
+		});
 	});
 });
 
@@ -201,7 +210,7 @@ apiv1.get('/experiments/update', function(req, res) {
 			});
 
 			res.jsonp({
-				message: 'Experiments have been updated.',
+				status: 'ok',
 				data: github
 			});
 
