@@ -37,7 +37,7 @@ apiv1.get('/all', function(req, res) {
 
 		return res.json({
 			status: 'ok',
-			result: apiResponse
+			data: apiResponse
 		});
 	}).then(null, function(err) {
 		return res.json({
