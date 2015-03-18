@@ -35,12 +35,12 @@ apiv1.get('/all', function(req, res) {
 	}).then(function(experiments) {
 		apiResponse = apiResponse.concat(experiments);
 
-		return res.json({
+		return res.jsonp({
 			status: 'ok',
 			data: apiResponse
 		});
 	}).then(null, function(err) {
-		return res.json({
+		return res.jsonp({
 			status: 'error',
 			data: err
 		});
