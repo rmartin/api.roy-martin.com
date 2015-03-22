@@ -35,6 +35,9 @@ apiv1.get('/all', function(req, res) {
 	}).then(function(experiments) {
 		apiResponse = apiResponse.concat(experiments);
 
+		//randomize the results and limit to the top 20
+		apiResponse = _.sample(apiResponse, 20);
+
 		return res.jsonp({
 			status: 'ok',
 			data: apiResponse
