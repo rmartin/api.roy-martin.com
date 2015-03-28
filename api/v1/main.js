@@ -81,7 +81,7 @@ apiv1.get('/activities/update', function(req, res) {
 		_.each(results, function(activity) {
 			activityModel = new ActivityModel({
 				id: activity.id,
-				type: 'activity',
+				type: 'roy-martin',
 				postDate: activity.start_date,
 				content: {
 					title: activity.name,
